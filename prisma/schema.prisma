@@ -1,0 +1,55 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Box {
+  id              String    @id @default(uuid()) @db.Uuid
+  reference       String
+  tracking_number String?
+  weight          Float?
+  content         String
+  price           Float?
+  country         String
+  sender_name     String
+  shipment_id     String?   @db.Uuid
+  created_at      DateTime  @default(now())
+  shipment        Shipment? @relation(fields: [shipment_id], references: [id])
+}
+
+model Shipment {
+  id                    String   @id @default(uuid()) @db.Uuid
+  reference_box         String
+  sender_name           String
+  recipient_name        String
+  recipient_phone       String
+  recipient_address     String
+  recipient_postal_code String
+  country               String
+  departure_date        DateTime @db.Date
+  arrival_date          DateTime @db.Date
+  status                String
+  price                 Float
+  weight                Float    @default(0)
+  created_at            DateTime @default(now())
+  boxes                 Box[]
+}
+
+model Sender {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique
+  created_at DateTime @default(now())
+}
+
+model Recipient {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String   @unique
+  created_at DateTime @default(now())
+}
+
+
